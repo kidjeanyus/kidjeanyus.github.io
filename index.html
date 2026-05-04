@@ -52,9 +52,8 @@
         .container { flex: 1; }
         
         header { text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
-        .identity-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        .id-input { background: #0f172a; border: 1px solid var(--border); padding: 12px; color: white; border-radius: 6px; outline: none; text-align: center; }
-        .id-input:focus { border-color: var(--accent); }
+        .header-title { color: var(--accent-green); font-weight: 900; letter-spacing: 2px; font-size: 1.2rem; }
+        .header-controls { margin-top: 15px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center; }
 
         .sidebar { width: 180px; display: flex; flex-direction: column; gap: 0; }
         .tabs { display: flex; flex-direction: column; gap: 0; }
@@ -89,7 +88,18 @@
             padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 -5px 30px rgba(0,0,0,0.8); z-index: 1000;
         }
+
+        .footer-info { display: flex; gap: 40px; }
+        .footer-left { display: flex; flex-direction: column; gap: 15px; flex: 1; }
+        .footer-totals { display: flex; gap: 40px; }
+        .total-item { flex: 0 0 auto; }
         .total-value { font-size: 1.8rem; font-weight: bold; color: #fff; font-family: monospace; }
+        .total-label { font-size: 0.7rem; color: #64748b; }
+
+        .identity-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .id-input { background: #0f172a; border: 1px solid var(--border); padding: 12px; color: white; border-radius: 6px; outline: none; text-align: center; font-size: 0.9rem; }
+        .id-input:focus { border-color: var(--accent); }
+
         .btn-submit { background: var(--accent); color: #000; border: none; padding: 15px 35px; border-radius: 6px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
         .btn-submit:hover { opacity: 0.9; transform: translateY(-2px); }
         .btn-submit:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
@@ -127,6 +137,8 @@
             .tab-btn.active-collectibles { border-left: 1px solid var(--border); border-bottom: 3px solid var(--accent); }
             .tab-btn.active-narcotics { border-left: 1px solid var(--border); border-bottom: 3px solid var(--accent-green); }
             .calc-footer { flex-direction: column; gap: 15px; text-align: center; padding: 15px; }
+            .footer-info { flex-direction: column; }
+            .footer-totals { justify-content: center; }
             .identity-bar { grid-template-columns: 1fr; }
         }
     </style>
@@ -150,12 +162,8 @@
 
     <div class="container">
         <header>
-            <div style="color: var(--accent-green); font-weight: 900; letter-spacing: 2px; font-size: 1.2rem;">YEET MARKETPLACE</div>
-            <div class="identity-bar">
-                <input type="text" id="playerName" class="id-input" placeholder="PLAYER NAME" oninput="saveIdentity()">
-                <input type="text" id="serverName" class="id-input" placeholder="SERVER NAME" oninput="saveIdentity()">
-            </div>
-            <div style="margin-top: 15px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;">
+            <div class="header-title">YEET MARKETPLACE</div>
+            <div class="header-controls">
                 <button id="ownerLoginBtn" onclick="authenticateOwner()" style="background:#00ff88; color:#000; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">OWNER LOGIN</button>
                 <button id="storeToggle" onclick="toggleStore()" style="background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">OPEN STORE</button>
             </div>
@@ -186,9 +194,15 @@
 </div>
 
 <div class="calc-footer" id="mainFooter">
-    <div style="display: flex; gap: 40px;">
-        <div><span style="font-size: 0.7rem; color: #64748b;">TOTAL ITEMS</span><br><span id="count" style="font-size: 1.5rem; font-weight: bold;">0</span></div>
-        <div><span style="font-size: 0.7rem; color: #64748b;">GRAND TOTAL</span><br><span id="total" class="total-value">$0</span></div>
+    <div class="footer-info">
+        <div class="identity-bar">
+            <input type="text" id="playerName" class="id-input" placeholder="PLAYER NAME" oninput="saveIdentity()">
+            <input type="text" id="serverName" class="id-input" placeholder="SERVER NAME" oninput="saveIdentity()">
+        </div>
+        <div class="footer-totals">
+            <div class="total-item"><span class="total-label">TOTAL ITEMS</span><br><span id="count" style="font-size: 1.5rem; font-weight: bold;">0</span></div>
+            <div class="total-item"><span class="total-label">GRAND TOTAL</span><br><span id="total" class="total-value">$0</span></div>
+        </div>
     </div>
     <button class="btn-submit" id="submitBtn" onclick="toggleModal(true)">REVIEW & TRANSMIT</button>
 </div>
