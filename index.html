@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YEET Marketplace | Unified Trade</title>
+    <style>
+        :root {
+            --bg: #0b0f1a;
+            --card-bg: #161b29;
+            --text: #e2e8f0;
+            --accent: #00d9ff;
+            --accent-green: #00ff88;
+            --sell-accent: #00ff88;
+            --collect-accent: #00d9ff;
+            --drug-accent: #00d9ff;
+            --border: #1e293b;
+            --danger: #00ff88;
+        }
+
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0b0f1a 0%, #1e293b 50%, #0b0f1a 100%);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999;
+        }
+        .loader-title {
+            font-size: 2.5rem; font-weight: 900; color: var(--danger);
+            text-transform: uppercase; letter-spacing: 5px;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.8), 0 0 40px rgba(0, 255, 136, 0.4);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(0, 255, 136, 0.8), 0 0 40px rgba(0, 255, 136, 0.4); }
+            to { text-shadow: 0 0 30px rgba(0, 255, 136, 1), 0 0 60px rgba(0, 255, 136, 0.6); }
+        }
+        .progress-bar {
+            width: 250px; height: 4px; background: rgba(255, 255, 255, 0.1);
+            margin-top: 20px; overflow: hidden; border-radius: 2px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        .progress-fill {
+            width: 0%; height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-green));
+            animation: load 1.5s forwards linear;
+            border-radius: 2px;
+        }
+        @keyframes load { 0% { width: 0%; } 100% { width: 100%; } }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 160px; overflow-x: hidden; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        
+        header { text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+        .identity-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .id-input { background: #0f172a; border: 1px solid var(--border); padding: 12px; color: white; border-radius: 6px; outline: none; text-align: center; }
+        .id-input:focus { border-color: var(--accent); }
+
+        .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+        .tab-btn { padding: 12px 5px; background: var(--card-bg); border: 1px solid var(--border); color: #64748b; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.7rem; text-transform: uppercase; transition: 0.2s; }
+        .tab-btn:hover { border-color: var(--accent); }
+        
+        .tab-btn.active-purchase { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 10px rgba(0, 217, 255, 0.2); }
+        .tab-btn.active-weapons { border-color: var(--accent-green); color: var(--accent-green); }
+        .tab-btn.active-collectibles { border-color: var(--accent); color: var(--accent); }
+        .tab-btn.active-narcotics { border-color: var(--accent-green); color: var(--accent-green); }
+
+        .search-bar { width: 100%; padding: 15px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: white; margin-bottom: 15px; box-sizing: border-box; outline: none; }
+        .search-bar:focus { border-color: var(--accent); }
+
+        .table-container { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #0f172a; padding: 12px; color: #64748b; text-align: left; font-size: 0.7rem; }
+        td { padding: 12px 15px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        
+        .qty-controls { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
+        .qty-btn { background: #1e293b; border: 1px solid var(--border); color: white; width: 32px; height: 32px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .qty-btn:hover { background: #334155; }
+        .qty-val { width: 30px; text-align: center; font-weight: bold; color: #fff; font-family: monospace; }
+
+        .item-row.has-qty { background: rgba(0, 255, 136, 0.05); }
+
+        .calc-footer {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #111827; border-top: 3px solid var(--accent);
+            padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.8); z-index: 1000;
+        }
+        .total-value { font-size: 1.8rem; font-weight: bold; color: #fff; font-family: monospace; }
+        .btn-submit { background: var(--accent); color: #000; border: none; padding: 15px 35px; border-radius: 6px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn-submit:hover { opacity: 0.9; transform: translateY(-2px); }
+        .btn-submit:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+
+        .store-closed {
+            text-align: center; padding: 50px; color: var(--text);
+            font-size: 1.5rem; font-weight: bold;
+        }
+
+        /* Modal Styles */
+        #reviewModal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center;
+        }
+        .modal-box {
+            background: var(--card-bg); width: 90%; max-width: 500px; border: 1px solid var(--accent);
+            border-radius: 12px; padding: 25px; box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+        #modalContent {
+            max-height: 350px; overflow-y: auto; margin: 20px 0; border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border); padding: 15px 0; font-family: monospace;
+        }
+        .modal-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
+
+        @media (max-width: 600px) {
+            .tabs { grid-template-columns: 1fr 1fr; }
+            .calc-footer { flex-direction: column; gap: 15px; text-align: center; padding: 15px; }
+            .identity-bar { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loader">
+    <div class="loader-title">YEET</div>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+</div>
+
+<div class="container">
+    <header>
+        <div style="color: var(--accent-green); font-weight: 900; letter-spacing: 2px; font-size: 1.2rem;">YEET MARKETPLACE</div>
+        <div class="identity-bar">
+            <input type="text" id="playerName" class="id-input" placeholder="PLAYER NAME" oninput="saveIdentity()">
+            <input type="text" id="serverName" class="id-input" placeholder="SERVER NAME" oninput="saveIdentity()">
+        </div>
+        <div style="margin-top: 15px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;">
+            <button id="ownerLoginBtn" onclick="authenticateOwner()" style="background:#00ff88; color:#000; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">OWNER LOGIN</button>
+            <button id="storeToggle" onclick="toggleStore()" style="background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">OPEN STORE</button>
+        </div>
+    </header>
+
+    <div id="storeClosed" class="store-closed" style="display: none;">
+        <div style="color: var(--accent-green); font-size: 2rem; margin-bottom: 20px;">STORE CLOSED</div>
+        <div>The marketplace is currently unavailable. Please check back later.</div>
+    </div>
+
+    <div id="storeOpen">
+    <div class="tabs">
+        <button class="tab-btn active-purchase" id="btn-purchase" onclick="showTab('purchase')">PURCHASE GOODS</button>
+        <button class="tab-btn" id="btn-weapons" onclick="showTab('weapons')">WEAPONS</button>
+        <button class="tab-btn" id="btn-collectibles" onclick="showTab('collectibles')">COLLECTIBLES</button>
+        <button class="tab-btn" id="btn-narcotics" onclick="showTab('narcotics')">NARCOTICS</button>
+    </div>
+
+    <input type="text" class="search-bar" id="mainSearch" placeholder="SEARCH CURRENT TAB..." onkeyup="filterTable()">
+
+    <div id="purchase-tab" class="content-section active">
+        <div class="table-container"><table><thead><tr><th>ITEM</th><th>PRICE</th><th style="text-align:right">QTY</th></tr></thead><tbody id="purchaseBody"></tbody></table></div>
+    </div>
+    <div id="weapons-tab" class="content-section">
+        <div class="table-container"><table><thead><tr><th>WEAPON</th><th>BASE</th><th style="text-align:right">QTY</th></tr></thead><tbody id="weaponsBody"></tbody></table></div>
+    </div>
+    <div id="collectibles-tab" class="content-section">
+        <div class="table-container"><table><thead><tr><th>COLLECTABLE</th><th>VALUE</th><th style="text-align:right">QTY</th></tr></thead><tbody id="collectiblesBody"></tbody></table></div>
+    </div>
+    <div id="narcotics-tab" class="content-section">
+        <div class="table-container"><table><thead><tr><th>PRODUCT</th><th>PRICE</th><th style="text-align:right">QTY</th></tr></thead><tbody id="narcoticsBody"></tbody></table></div>
+    </div>
+    </div>
+</div>
+
+<div class="calc-footer" id="mainFooter">
+    <div style="display: flex; gap: 40px;">
+        <div><span style="font-size: 0.7rem; color: #64748b;">TOTAL ITEMS</span><br><span id="count" style="font-size: 1.5rem; font-weight: bold;">0</span></div>
+        <div><span style="font-size: 0.7rem; color: #64748b;">GRAND TOTAL</span><br><span id="total" class="total-value">$0</span></div>
+    </div>
+    <button class="btn-submit" id="submitBtn" onclick="toggleModal(true)">REVIEW & TRANSMIT</button>
+</div>
+
+<div id="reviewModal">
+    <div class="modal-box">
+        <h2 style="color:var(--accent); margin:0; font-size: 1.2rem; text-transform:uppercase;">Confirm Manifest</h2>
+        <div id="modalContent"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button onclick="toggleModal(false)" style="background:#334155; color:white; border:none; padding:12px; border-radius:6px; cursor:pointer; font-weight:bold;">BACK</button>
+            <button onclick="confirmAndSend()" style="background:var(--accent-green); color:black; border:none; padding:12px; border-radius:6px; cursor:pointer; font-weight:bold;">CONFIRM</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- CONFIGURATION ---
+    const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1500715420083163247/pXUooNWr6xoV3DgyDfKSZgOt2UbzD9Hjzdw4zM1OBk6RnUxOIKsnbXiFhurG__0eYBvP"; 
+
+    const masterData = {
+        purchase: [
+            ["AS50 5 Mags & 10 Stacks", 425000],
+            ["PKP w/3 Mags", 375000],
+            [".50 BMG Stack", 7500],
+            ["PKP Mag", 40000],
+            ["AS50 Mag", 15000],
+            ["TF AA12 Ammo Stack", 50000],
+            ["TF AA12 Mag", 90000],
+            ["TF Badger Ammo Stack", 20000],
+            ["TF Badger Mag", 110000],
+            ["TF Badger Mag (5 Mag Package)", 500000],
+            ["TF50 Ammo Stack", 35000],
+            ["TF50 Mag", 90000],
+            ["TF Gator Ammo Stack", 145000],
+            ["TF Gator Mag", 145000],
+            ["Gator Ammo Stack (non TF)", 1500],
+            ["Gator Mag (non TF)", 9000],
+            ["Scar H 100rd Mag", 35000]
+        ],
+        weapons: [
+            ["ASH 12.7", 60000],
+            ["AAC Honey Badger", 12000],
+            ["AWM", 25000],
+            ["CheyTac M200", 35000],
+            ["CheyTac M300", 35000],
+            ["Gold Deagle", 12000],
+            ["T5000", 25000],
+            ["DVL-10", 25000],
+            ["Gevar MK-3", 35000],
+            ["GCGN M82", 70000],
+            ["GM6 Lynx", 60000],
+            ["KAC PDW", 20000],
+            ["Kivaari", 45000],
+            ["M249", 65000],
+            ["M60", 35000],
+            ["M24A3 (SNAFU)", 20000],
+            ["M24A3 (Morty)", 25000],
+            ["M96", 40000],
+            ["M98B", 20000],
+            ["Mar10", 20000],
+            ["Remington M700", 20000],
+            ["RSASS", 20000],
+            ["SNAFU Scar-H", 20000],
+            ["SRS A2", 35000],
+            ["TAC-21", 25000],
+            ["VSSK", 60000],
+            ["Suicide Vest", 20000],
+            ["M82A1", 90000],
+            ["MRAD", 20000],
+            ["Beowulf", 35000],
+            ["F&D Defense", 35000],
+            ["Gevar 43 .338", 35000],
+            ["AS50", 90000],
+            ["PKP", 90000],
+            ["Alligator", 90000]
+        ],
+        collectibles: [
+            ["Mined Bitcoin", 50000],
+            ["Found Bitcoin", 25000],
+            ["Retro Toy", 15000],
+            ["Retro Memory Card", 15000],
+            ["Smartphone", 10000],
+            ["RAM", 15000],
+            ["Pocket Watch", 15000],
+            ["Sports Cards", 10000],
+            ["Tetris Toy", 15000],
+            ["Intel Folder", 15000],
+            ["GPU", 15000],
+            ["Gameboy Cartridge", 15000],
+            ["Floppy Disc", 15000]
+        ],
+        narcotics: [
+            ["Coke Brick", 65000],
+            ["Weed Brick", 30000],
+            ["Coke Hypodermic", 5000]
+        ]
+    };
+    let selections = {};
+    let currentMode = 'purchase';
+    let storeOpen = true;
+    const STORE_PASSWORD = "YEET"; // change this value to your own secret passcode
+    let ownerAuthenticated = false;
+
+    // --- INITIALIZATION ---
+    window.addEventListener('load', () => {
+        try {
+            loadIdentity();
+            loadOwnerAuth();
+            initTables();
+        } catch (error) {
+            console.error('Initialization error:', error);
+        }
+        
+        setTimeout(() => {
+            const loader = document.getElementById('loader');
+            if (loader) loader.style.display = 'none';
+        }, 1500);
+    });
+
+    function loadOwnerAuth() {
+        ownerAuthenticated = localStorage.getItem('yeet_owner_authed') === 'true';
+        updateStoreControl();
+    }
+
+    function authenticateOwner() {
+        let password = prompt("ENTER STORE OWNER PASSWORD") || "";
+
+        if (password === STORE_PASSWORD) {
+            ownerAuthenticated = true;
+            localStorage.setItem('yeet_owner_authed', 'true');
+            alert("OWNER ACCESS GRANTED");
+        } else {
+            ownerAuthenticated = false;
+            localStorage.setItem('yeet_owner_authed', 'false');
+            alert("ACCESS DENIED");
+        }
+
+        updateStoreControl();
+    }
+
+    function updateStoreControl() {
+        const toggleBtn = document.getElementById('storeToggle');
+        const loginBtn = document.getElementById('ownerLoginBtn');
+        if (!toggleBtn || !loginBtn) return;
+
+        toggleBtn.disabled = false;
+        toggleBtn.style.opacity = ownerAuthenticated ? '1' : '0.8';
+        loginBtn.innerText = ownerAuthenticated ? 'OWNER UNLOCKED' : 'OWNER LOGIN';
+    }
+
+    function toggleStore() {
+        if (!ownerAuthenticated) {
+            const password = prompt("ENTER STORE OWNER PASSWORD") || "";
+            if (password !== STORE_PASSWORD) {
+                alert("ACCESS DENIED");
+                return;
+            }
+            ownerAuthenticated = true;
+            localStorage.setItem('yeet_owner_authed', 'true');
+            alert("OWNER ACCESS GRANTED");
+            updateStoreControl();
+        }
+
+        storeOpen = !storeOpen;
+        localStorage.setItem('yeet_store_open', storeOpen);
+        updateStoreDisplay();
+    }
+
+    function initTables() {
+        Object.keys(masterData).forEach(key => {
+            const body = document.getElementById(key + 'Body');
+            masterData[key].forEach(item => {
+                let tr = document.createElement('tr');
+                tr.className = 'item-row';
+                const safeName = item[0].replace(/'/g, "\\'");
+                tr.innerHTML = `
+                    <td>${item[0]}</td>
+                    <td class="price">$${item[1].toLocaleString()}</td>
+                    <td class="qty-controls">
+                        <button class="qty-btn" onclick="changeQty('${safeName}', -1, this)">-</button>
+                        <span class="qty-val" id="qty-${item[0]}">0</span>
+                        <button class="qty-btn" onclick="changeQty('${safeName}', 1, this)">+</button>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+        });
+    }
+
+    // --- LOGIC ---
+    function changeQty(name, delta, btn) {
+        if (!storeOpen) {
+            alert("THE STORE IS CURRENTLY CLOSED. YOU CANNOT MODIFY YOUR ORDER.");
+            return;
+        }
+        
+        if(!selections[name]) selections[name] = 0;
+        selections[name] = Math.max(0, selections[name] + delta);
+        
+        document.getElementById('qty-' + name).innerText = selections[name];
+        
+        const row = btn.closest('tr');
+        if(selections[name] > 0) row.classList.add('has-qty');
+        else row.classList.remove('has-qty');
+
+        calculateGlobal();
+    }
+
+    function calculateGlobal() {
+        let totalVal = 0;
+        let totalCount = 0;
+        
+        // Scan ALL data to fix the "Persistent" bug
+        Object.values(masterData).flat().forEach(item => {
+            let q = selections[item[0]] || 0;
+            if(q > 0) {
+                totalVal += item[1] * q;
+                totalCount += q;
+            }
+        });
+
+        document.getElementById('count').innerText = totalCount;
+        document.getElementById('total').innerText = '$' + totalVal.toLocaleString();
+    }
+
+    function showTab(m) {
+        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(m + '-tab').classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(b => b.className = 'tab-btn');
+        document.getElementById('btn-' + m).classList.add('active-' + m);
+        
+        const colors = { purchase: '#00d9ff', weapons: '#00ff88', collectibles: '#00d9ff', narcotics: '#00ff88' };
+        document.getElementById('mainFooter').style.borderTopColor = colors[m];
+        document.getElementById('submitBtn').style.backgroundColor = colors[m];
+        currentMode = m;
+    }
+
+    function filterTable() {
+        let q = document.getElementById('mainSearch').value.toUpperCase();
+        document.querySelectorAll('.content-section.active tr.item-row').forEach(r => {
+            r.style.display = r.innerText.toUpperCase().includes(q) ? "" : "none";
+        });
+    }
+
+    // --- MODAL & DISCORD ---
+    function toggleModal(show) {
+        const modal = document.getElementById('reviewModal');
+        const content = document.getElementById('modalContent');
+        
+        if (show) {
+            if (!storeOpen) {
+                alert("THE STORE IS CURRENTLY CLOSED. ORDERS CANNOT BE PLACED.");
+                return;
+            }
+            
+            let summary = "";
+            let hasItems = false;
+
+            for (const [category, items] of Object.entries(masterData)) {
+                let catHtml = "";
+                items.forEach(item => {
+                    const q = selections[item[0]] || 0;
+                    if (q > 0) {
+                        catHtml += `<div class="modal-row">
+                            <span>${item[0]} (x${q})</span>
+                            <span style="color:var(--accent)">$${(item[1] * q).toLocaleString()}</span>
+                        </div>`;
+                        hasItems = true;
+                    }
+                });
+                if (catHtml) {
+                    summary += `<div style="color:#64748b; font-size:0.7rem; margin-top:15px; border-bottom:1px solid #1e293b; padding-bottom:3px; margin-bottom:8px;">${category.toUpperCase()}</div>` + catHtml;
+                }
+            }
+
+            if (!hasItems) return alert("YOUR MANIFEST IS EMPTY");
+            
+            content.innerHTML = summary + `<div style="margin-top:20px; text-align:right; font-weight:bold; font-size:1.2rem; border-top: 1px dashed #334155; padding-top:10px;">TOTAL: ${document.getElementById('total').innerText}</div>`;
+            modal.style.display = 'flex';
+        } else {
+            modal.style.display = 'none';
+        }
+    }
+
+    async function confirmAndSend() {
+        if (!storeOpen) {
+            alert("THE STORE IS CURRENTLY CLOSED. ORDERS CANNOT BE PLACED.");
+            return;
+        }
+        
+        const pName = document.getElementById('playerName').value || "N/A";
+        const sName = document.getElementById('serverName').value || "N/A";
+        
+        let manifestLines = [];
+        for (const [category, items] of Object.entries(masterData)) {
+            let catGroup = [];
+            items.forEach(item => {
+                const q = selections[item[0]] || 0;
+                if (q > 0) catGroup.push(`[${q}x] ${item[0]}`);
+            });
+            if(catGroup.length > 0) {
+                manifestLines.push(`--- ${category.toUpperCase()} ---`);
+                manifestLines.push(...catGroup);
+                manifestLines.push(""); // Spacer
+            }
+        }
+
+        const payload = {
+            username: "YEET DISPATCH",
+            embeds: [{
+                title: "📦 NEW MARKETPLACE ORDER",
+                color: 65408,
+                fields: [
+                    { name: "OPERATOR", value: `\`${pName}\``, inline: true },
+                    { name: "SERVER", value: `\`${sName}\``, inline: true },
+                    { name: "GRAND TOTAL", value: `**${document.getElementById('total').innerText}**`, inline: false },
+                    { name: "MANIFEST", value: "```ml\n" + manifestLines.join("\n") + "\n```" }
+                ],
+                footer: { text: "YEET Marketplace • Automated Logistics" },
+                timestamp: new Date().toISOString()
+            }]
+        };
+
+        try {
+            const res = await fetch(DISCORD_WEBHOOK_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            });
+            if(res.ok) {
+                toggleModal(false);
+                alert("TRANSMISSION SUCCESSFUL");
+                location.reload();
+            } else { alert("WEBHOOK ERROR"); }
+        } catch (e) { alert("NETWORK FAIL"); }
+    }
+
+    // --- LOCAL STORAGE ---
+    function saveIdentity() {
+        localStorage.setItem('yeet_player', document.getElementById('playerName').value);
+        localStorage.setItem('yeet_server', document.getElementById('serverName').value);
+    }
+
+    function loadIdentity() {
+        if(localStorage.getItem('yeet_player')) document.getElementById('playerName').value = localStorage.getItem('yeet_player');
+        if(localStorage.getItem('yeet_server')) document.getElementById('serverName').value = localStorage.getItem('yeet_server');
+        storeOpen = localStorage.getItem('yeet_store_open') !== 'false';
+        updateStoreDisplay();
+    }
+
+    function updateStoreDisplay() {
+        const storeOpenEl = document.getElementById('storeOpen');
+        const storeClosedEl = document.getElementById('storeClosed');
+        const footer = document.getElementById('mainFooter');
+        const toggleBtn = document.getElementById('storeToggle');
+        
+        if (storeOpen) {
+            storeOpenEl.style.display = 'block';
+            storeClosedEl.style.display = 'none';
+            if (footer) {
+                footer.style.display = 'flex';
+                footer.style.pointerEvents = 'auto';
+            }
+            toggleBtn.innerText = 'CLOSE STORE';
+        } else {
+            storeOpenEl.style.display = 'none';
+            storeClosedEl.style.display = 'block';
+            if (footer) {
+                footer.style.display = 'none';
+                footer.style.pointerEvents = 'none';
+            }
+            toggleBtn.innerText = 'OPEN STORE';
+            
+            // Clear any selections when closing store
+            selections = {};
+            document.getElementById('count').innerText = '0';
+            document.getElementById('total').innerText = '$0';
+            
+            // Reset all quantity displays
+            document.querySelectorAll('.qty-val').forEach(el => el.innerText = '0');
+            document.querySelectorAll('.item-row').forEach(row => row.classList.remove('has-qty'));
+        }
+    }
+    
+</script>
+</body>
+</html>
