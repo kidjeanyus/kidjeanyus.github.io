@@ -51,9 +51,12 @@
         .main-wrapper { display: flex; gap: 20px; max-width: 1200px; margin: 0 auto; padding: 20px; }
         .container { flex: 1; }
         
-        header { text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+        header { text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); position: relative; }
         .header-title { color: var(--accent-green); font-weight: 900; letter-spacing: 2px; font-size: 1.2rem; }
-        .header-controls { margin-top: 15px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center; }
+        .header-controls { position: absolute; top: 0; right: 0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end; }
+        .header-controls button { border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        #ownerLoginBtn { background: #00ff88; color: #000; }
+        #storeToggle { background: var(--accent); color: #000; }
 
         .sidebar { width: 180px; display: flex; flex-direction: column; gap: 0; }
         .tabs { display: flex; flex-direction: column; gap: 0; }
@@ -140,6 +143,7 @@
             .footer-info { flex-direction: column; }
             .footer-totals { justify-content: center; }
             .identity-bar { grid-template-columns: 1fr; }
+            .header-controls { position: static; margin-top: 15px; }
         }
     </style>
 </head>
@@ -164,8 +168,8 @@
         <header>
             <div class="header-title">YEET MARKETPLACE</div>
             <div class="header-controls">
-                <button id="ownerLoginBtn" onclick="authenticateOwner()" style="background:#00ff88; color:#000; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">OWNER LOGIN</button>
-                <button id="storeToggle" onclick="toggleStore()" style="background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">OPEN STORE</button>
+                <button id="ownerLoginBtn" onclick="authenticateOwner()">OWNER LOGIN</button>
+                <button id="storeToggle" onclick="toggleStore()">OPEN STORE</button>
             </div>
         </header>
 
