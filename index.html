@@ -70,9 +70,6 @@
         .tab-btn.active-collectibles { border-left: 3px solid var(--accent); color: var(--accent); background: rgba(0, 217, 255, 0.1); }
         .tab-btn.active-narcotics { border-left: 3px solid var(--accent-green); color: var(--accent-green); background: rgba(0, 255, 136, 0.1); }
 
-        .search-bar { width: 100%; padding: 15px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: white; margin-bottom: 15px; box-sizing: border-box; outline: none; }
-        .search-bar:focus { border-color: var(--accent); }
-
         .table-container { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; }
         th { background: #0f172a; padding: 12px; color: #64748b; text-align: left; font-size: 0.7rem; }
@@ -179,8 +176,6 @@
         </div>
 
         <div id="storeOpen">
-            <input type="text" class="search-bar" id="mainSearch" placeholder="SEARCH CURRENT TAB..." onkeyup="filterTable()">
-
             <div id="purchase-tab" class="content-section active">
                 <div class="table-container"><table><thead><tr><th>ITEM</th><th>PRICE</th><th style="text-align:right">QTY</th></tr></thead><tbody id="purchaseBody"></tbody></table></div>
             </div>
@@ -208,7 +203,7 @@
             <div class="total-item"><span class="total-label">GRAND TOTAL</span><br><span id="total" class="total-value">$0</span></div>
         </div>
     </div>
-    <button class="btn-submit" id="submitBtn" onclick="toggleModal(true)">REVIEW & TRANSMIT</button>
+    <button class="btn-submit" id="submitBtn" onclick="toggleModal(true)">PREVIEW & ORDER</button>
 </div>
 
 <div id="reviewModal">
@@ -442,13 +437,6 @@
         document.getElementById('mainFooter').style.borderTopColor = colors[m];
         document.getElementById('submitBtn').style.backgroundColor = colors[m];
         currentMode = m;
-    }
-
-    function filterTable() {
-        let q = document.getElementById('mainSearch').value.toUpperCase();
-        document.querySelectorAll('.content-section.active tr.item-row').forEach(r => {
-            r.style.display = r.innerText.toUpperCase().includes(q) ? "" : "none";
-        });
     }
 
     // --- MODAL & DISCORD ---
