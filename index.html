@@ -48,21 +48,25 @@
         @keyframes load { 0% { width: 0%; } 100% { width: 100%; } }
 
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 160px; overflow-x: hidden; }
-        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .main-wrapper { display: flex; gap: 20px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .container { flex: 1; }
         
         header { text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
         .identity-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
         .id-input { background: #0f172a; border: 1px solid var(--border); padding: 12px; color: white; border-radius: 6px; outline: none; text-align: center; }
         .id-input:focus { border-color: var(--accent); }
 
-        .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
-        .tab-btn { padding: 12px 5px; background: var(--card-bg); border: 1px solid var(--border); color: #64748b; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.7rem; text-transform: uppercase; transition: 0.2s; }
-        .tab-btn:hover { border-color: var(--accent); }
+        .sidebar { width: 180px; display: flex; flex-direction: column; gap: 0; }
+        .tabs { display: flex; flex-direction: column; gap: 0; }
+        .tab-btn { padding: 12px 15px; background: var(--card-bg); border: 1px solid var(--border); color: #64748b; border-radius: 0; cursor: pointer; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; transition: 0.2s; text-align: left; }
+        .tab-btn:first-child { border-radius: 6px 6px 0 0; }
+        .tab-btn:last-child { border-radius: 0 0 6px 6px; }
+        .tab-btn:hover { border-color: var(--accent); background: rgba(0, 217, 255, 0.1); }
         
-        .tab-btn.active-purchase { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 10px rgba(0, 217, 255, 0.2); }
-        .tab-btn.active-weapons { border-color: var(--accent-green); color: var(--accent-green); }
-        .tab-btn.active-collectibles { border-color: var(--accent); color: var(--accent); }
-        .tab-btn.active-narcotics { border-color: var(--accent-green); color: var(--accent-green); }
+        .tab-btn.active-purchase { border-left: 3px solid var(--accent); color: var(--accent); background: rgba(0, 217, 255, 0.1); }
+        .tab-btn.active-weapons { border-left: 3px solid var(--accent-green); color: var(--accent-green); background: rgba(0, 255, 136, 0.1); }
+        .tab-btn.active-collectibles { border-left: 3px solid var(--accent); color: var(--accent); background: rgba(0, 217, 255, 0.1); }
+        .tab-btn.active-narcotics { border-left: 3px solid var(--accent-green); color: var(--accent-green); background: rgba(0, 255, 136, 0.1); }
 
         .search-bar { width: 100%; padding: 15px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: white; margin-bottom: 15px; box-sizing: border-box; outline: none; }
         .search-bar:focus { border-color: var(--accent); }
@@ -113,8 +117,15 @@
         }
         .modal-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
 
-        @media (max-width: 600px) {
-            .tabs { grid-template-columns: 1fr 1fr; }
+        @media (max-width: 900px) {
+            .main-wrapper { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .tabs { flex-direction: row; gap: 8px; }
+            .tab-btn { flex: 1; border-left: 1px solid var(--border); border-bottom: 3px solid transparent; border-radius: 6px; }
+            .tab-btn.active-purchase { border-left: 1px solid var(--border); border-bottom: 3px solid var(--accent); }
+            .tab-btn.active-weapons { border-left: 1px solid var(--border); border-bottom: 3px solid var(--accent-green); }
+            .tab-btn.active-collectibles { border-left: 1px solid var(--border); border-bottom: 3px solid var(--accent); }
+            .tab-btn.active-narcotics { border-left: 1px solid var(--border); border-bottom: 3px solid var(--accent-green); }
             .calc-footer { flex-direction: column; gap: 15px; text-align: center; padding: 15px; }
             .identity-bar { grid-template-columns: 1fr; }
         }
@@ -127,46 +138,50 @@
     <div class="progress-bar"><div class="progress-fill"></div></div>
 </div>
 
-<div class="container">
-    <header>
-        <div style="color: var(--accent-green); font-weight: 900; letter-spacing: 2px; font-size: 1.2rem;">YEET MARKETPLACE</div>
-        <div class="identity-bar">
-            <input type="text" id="playerName" class="id-input" placeholder="PLAYER NAME" oninput="saveIdentity()">
-            <input type="text" id="serverName" class="id-input" placeholder="SERVER NAME" oninput="saveIdentity()">
+<div class="main-wrapper">
+    <div class="sidebar">
+        <div class="tabs">
+            <button class="tab-btn active-purchase" id="btn-purchase" onclick="showTab('purchase')">PURCHASE GOODS</button>
+            <button class="tab-btn" id="btn-weapons" onclick="showTab('weapons')">WEAPONS</button>
+            <button class="tab-btn" id="btn-collectibles" onclick="showTab('collectibles')">COLLECTIBLES</button>
+            <button class="tab-btn" id="btn-narcotics" onclick="showTab('narcotics')">NARCOTICS</button>
         </div>
-        <div style="margin-top: 15px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;">
-            <button id="ownerLoginBtn" onclick="authenticateOwner()" style="background:#00ff88; color:#000; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">OWNER LOGIN</button>
-            <button id="storeToggle" onclick="toggleStore()" style="background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">OPEN STORE</button>
+    </div>
+
+    <div class="container">
+        <header>
+            <div style="color: var(--accent-green); font-weight: 900; letter-spacing: 2px; font-size: 1.2rem;">YEET MARKETPLACE</div>
+            <div class="identity-bar">
+                <input type="text" id="playerName" class="id-input" placeholder="PLAYER NAME" oninput="saveIdentity()">
+                <input type="text" id="serverName" class="id-input" placeholder="SERVER NAME" oninput="saveIdentity()">
+            </div>
+            <div style="margin-top: 15px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;">
+                <button id="ownerLoginBtn" onclick="authenticateOwner()" style="background:#00ff88; color:#000; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">OWNER LOGIN</button>
+                <button id="storeToggle" onclick="toggleStore()" style="background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">OPEN STORE</button>
+            </div>
+        </header>
+
+        <div id="storeClosed" class="store-closed" style="display: none;">
+            <div style="color: var(--accent-green); font-size: 2rem; margin-bottom: 20px;">STORE CLOSED</div>
+            <div>The marketplace is currently unavailable. Please check back later.</div>
         </div>
-    </header>
 
-    <div id="storeClosed" class="store-closed" style="display: none;">
-        <div style="color: var(--accent-green); font-size: 2rem; margin-bottom: 20px;">STORE CLOSED</div>
-        <div>The marketplace is currently unavailable. Please check back later.</div>
-    </div>
+        <div id="storeOpen">
+            <input type="text" class="search-bar" id="mainSearch" placeholder="SEARCH CURRENT TAB..." onkeyup="filterTable()">
 
-    <div id="storeOpen">
-    <div class="tabs">
-        <button class="tab-btn active-purchase" id="btn-purchase" onclick="showTab('purchase')">PURCHASE GOODS</button>
-        <button class="tab-btn" id="btn-weapons" onclick="showTab('weapons')">WEAPONS</button>
-        <button class="tab-btn" id="btn-collectibles" onclick="showTab('collectibles')">COLLECTIBLES</button>
-        <button class="tab-btn" id="btn-narcotics" onclick="showTab('narcotics')">NARCOTICS</button>
-    </div>
-
-    <input type="text" class="search-bar" id="mainSearch" placeholder="SEARCH CURRENT TAB..." onkeyup="filterTable()">
-
-    <div id="purchase-tab" class="content-section active">
-        <div class="table-container"><table><thead><tr><th>ITEM</th><th>PRICE</th><th style="text-align:right">QTY</th></tr></thead><tbody id="purchaseBody"></tbody></table></div>
-    </div>
-    <div id="weapons-tab" class="content-section">
-        <div class="table-container"><table><thead><tr><th>WEAPON</th><th>BASE</th><th style="text-align:right">QTY</th></tr></thead><tbody id="weaponsBody"></tbody></table></div>
-    </div>
-    <div id="collectibles-tab" class="content-section">
-        <div class="table-container"><table><thead><tr><th>COLLECTABLE</th><th>VALUE</th><th style="text-align:right">QTY</th></tr></thead><tbody id="collectiblesBody"></tbody></table></div>
-    </div>
-    <div id="narcotics-tab" class="content-section">
-        <div class="table-container"><table><thead><tr><th>PRODUCT</th><th>PRICE</th><th style="text-align:right">QTY</th></tr></thead><tbody id="narcoticsBody"></tbody></table></div>
-    </div>
+            <div id="purchase-tab" class="content-section active">
+                <div class="table-container"><table><thead><tr><th>ITEM</th><th>PRICE</th><th style="text-align:right">QTY</th></tr></thead><tbody id="purchaseBody"></tbody></table></div>
+            </div>
+            <div id="weapons-tab" class="content-section">
+                <div class="table-container"><table><thead><tr><th>WEAPON</th><th>BASE</th><th style="text-align:right">QTY</th></tr></thead><tbody id="weaponsBody"></tbody></table></div>
+            </div>
+            <div id="collectibles-tab" class="content-section">
+                <div class="table-container"><table><thead><tr><th>COLLECTABLE</th><th>VALUE</th><th style="text-align:right">QTY</th></tr></thead><tbody id="collectiblesBody"></tbody></table></div>
+            </div>
+            <div id="narcotics-tab" class="content-section">
+                <div class="table-container"><table><thead><tr><th>PRODUCT</th><th>PRICE</th><th style="text-align:right">QTY</th></tr></thead><tbody id="narcoticsBody"></tbody></table></div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -274,7 +289,7 @@
     let selections = {};
     let currentMode = 'purchase';
     let storeOpen = true;
-    const STORE_PASSWORD = "YEET"; // change this value to your own secret passcode
+    const STORE_PASSWORD = "76Ttam76$";
     let ownerAuthenticated = false;
 
     // --- INITIALIZATION ---
